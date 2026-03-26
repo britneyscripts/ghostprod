@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "Analysis": {
+      "title": "Analysis",
+      "description": "A PDP analysis result",
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "description": "The analyzed URL" },
+        "score": { "type": "number", "description": "Final Agent-Readiness Score" },
+        "breakdown": {
+          "type": "object",
+          "properties": {
+            "performance": { "type": "number" },
+            "schema": { "type": "number" },
+            "content": { "type": "number" }
+          }
+        },
+        "analysis": {
+          "type": "object",
+          "properties": {
+            "gap": { "type": "string" },
+            "missing": { "type": "array", "items": { "type": "string" } },
+            "recommendation": { "type": "string" }
+          }
+        },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["url", "score", "timestamp"]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "A beta tester lead",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/analyses/{analysisId}": {
+      "schema": "Analysis",
+      "description": "Stored PDP analyses"
+    },
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Beta tester leads"
+    }
+  }
+}

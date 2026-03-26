@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: analyses
+    // Fields:
+    //   - url: string (required)
+    //   - score: number (required)
+    //   - breakdown: map (required)
+    //   - analysis: map (required)
+    //   - timestamp: timestamp (required)
+    //
+    // Collection: leads
+    // Fields:
+    //   - email: string (required)
+    //   - timestamp: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidAnalysis(data) {
+      return data.url is string && 
+             data.score is number && 
+             data.breakdown is map && 
+             data.analysis is map && 
+             data.timestamp is timestamp;
+    }
+
+    function isValidLead(data) {
+      return data.email is string && isValidEmail(data.email) && data.timestamp is timestamp;
+    }
+
+    // Rules
+    match /analyses/{analysisId} {
+      allow read: if true; // Publicly readable for demo purposes
+      allow create: if isValidAnalysis(request.resource.data);
+    }
+
+    match /leads/{leadId} {
+      allow create: if isValidLead(request.resource.data);
+      allow read: if false; // Only admin can read (not implemented in rules yet)
+    }
+  }
+}

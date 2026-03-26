@@ -1,0 +1,5 @@
+{
+  "name": "ghostprod",
+  "description": "Agent-Readiness Score for Brazilian e-commerce PDPs. Diagnose if your product pages are legible for AI agents.",
+  "requestFramePermissions": []
+}

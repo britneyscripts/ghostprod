@@ -1,0 +1,91 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&family=Outfit:wght@400;600&display=swap');
+
+@theme {
+  --font-display: "Orbitron", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+  --font-accent: "Outfit", sans-serif;
+
+  --color-void: #0F0F2A;
+  --color-cyber: #1A1A2E;
+  --color-neon-cyan: #00CED1;
+  --color-neon-pink: #FF00FF;
+  --color-neon-purple: #8A2BE2;
+  --color-text-primary: #E2E8F0;
+  --color-text-muted: #94A3B8;
+}
+
+@layer base {
+  body {
+    @apply bg-void text-text-primary font-sans overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .scanline {
+    width: 100%;
+    height: 100px;
+    z-index: 9999;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(255, 255, 255, 0.05) 10%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    opacity: 0.1;
+    position: fixed;
+    bottom: 100%;
+    animation: scanline 10s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes scanline {
+    0% { bottom: 100%; }
+    100% { bottom: -100%; }
+  }
+
+  .digital-score {
+    text-shadow: 0 0 10px var(--color-neon-cyan);
+  }
+
+  .glass-card {
+    @apply bg-cyber/50 backdrop-blur-md border border-white/10 rounded-xl;
+  }
+
+  .crt-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0% { opacity: 0.97; }
+    5% { opacity: 0.95; }
+    10% { opacity: 0.9; }
+    15% { opacity: 0.95; }
+    20% { opacity: 0.98; }
+    25% { opacity: 0.95; }
+    30% { opacity: 0.9; }
+    35% { opacity: 0.95; }
+    40% { opacity: 0.98; }
+    45% { opacity: 0.95; }
+    50% { opacity: 0.9; }
+    55% { opacity: 0.95; }
+    60% { opacity: 0.98; }
+    65% { opacity: 0.95; }
+    70% { opacity: 0.9; }
+    75% { opacity: 0.95; }
+    80% { opacity: 0.98; }
+    85% { opacity: 0.95; }
+    90% { opacity: 0.9; }
+    95% { opacity: 0.95; }
+    100% { opacity: 0.98; }
+  }
+
+  .grid-bg {
+    background-image: 
+      linear-gradient(to right, rgba(138, 43, 226, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(138, 43, 226, 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
