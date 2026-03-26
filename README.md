@@ -257,7 +257,7 @@ O ghostprod começou como protótipo no Google AI Studio. Aqui está o que aprov
 
 ```
 🚫 PROIBIDO deploy às sextas-feiras
-   Freeze: sexta 17h → segunda 9h
+   Freeze: sexta 11h → segunda 9h
 
 Branches:
   main      → produção (protegida — PR obrigatório)
@@ -292,11 +292,25 @@ Este projeto é parte da tese de MBA em Ciência de Dados do **ICMC/USP** sobre 
 
 ## Autora
 
-**Eva De Paula**
-Senior Lead PM · 7+ anos em e-commerce e dados
+**Eva Bettina**
+Senior PM · Orquestradora · Curiosa 🔮
 MBA Ciência de Dados — ICMC/USP
 
-[LinkedIn](https://linkedin.com/in/evadepaula) · [Substack](https://substack.com/@evadepaula) · [ghostprod.io](https://ghostprod.io)
+[LinkedIn](https://linkedin.com/in/eva-de-paula) · [Substack](https://substack.com/@evadepaula) · [ghostprod.io](https://ghostprod.io)
+
+---
+
+## Feito com carinho por 💜
+
+```
+Eva Bettina          🧠  Senior PM · Orquestradora · Curiosa
+Claude (Anthropic)   🤍  Arquitetura · Código · Documentação
+Gemini (Google)      💙  Gap Analysis · UI Prototyping
+AI Studio (Google)   🩵  Frontend vaporwave
+Opal (Google Labs)   💜  Prototipagem visual   
+```
+
+> *"A melhor stack é a que resolve o problema — com ou sem framework."*
 
 ---
 
