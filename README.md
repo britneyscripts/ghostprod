@@ -24,7 +24,7 @@
 
 **ghostprod** é uma ferramenta de diagnóstico de visibilidade para agentes de IA. Ela analisa uma página de produto (PDP) de e-commerce e retorna um **Agent-Readiness Score (ARS)** de 0 a 100 — indicando se aquela página seria encontrada, lida e incluída em uma comparação por um agente de Level 1.
 
-Desenvolvida como parte de uma pesquisa de doutorado no **ICMC/USP** sobre agentic commerce no Brasil.
+Desenvolvida como parte de uma pesquisa do MBA em ciência de dados no **ICMC/USP** sobre agentic commerce no Brasil.
 
 ---
 
