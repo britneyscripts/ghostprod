@@ -1,6 +1,6 @@
 # 👻 ghostprod
 
-**Seu produto existe. Para os agentes de IA, é um fantasma.**
+**Seu produto existe. Visível para humanos. Invisível para agentes..**
 
 [![Status](https://img.shields.io/badge/status-v0.1%20beta-8A2BE2?style=flat-square)](https://ghostprod.io)
 [![License](https://img.shields.io/badge/license-MIT-00CED1?style=flat-square)](LICENSE)
