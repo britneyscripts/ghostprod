@@ -13,7 +13,7 @@ mas gera o diagnóstico qualitativo e as recomendações.
 """
 
 import concurrent.futures
-from agents import agent1_crux, agent2_schema, agent3_nlp, agent4_gap
+from agents import agent1_crux, agent1_pagespeed, agent2_schema, agent3_nlp, agent4_gap
 
 # Pesos do Agent-Readiness Score (ARS)
 PESOS = {
@@ -50,21 +50,24 @@ def calcular_ars(p_crux: int, p_schema: int, p_nlp: int) -> int:
 def analisar(url: str, query: str = None) -> dict:
     """
     Função principal do orquestrador.
-    Roda Agentes 1, 2 e 3 em paralelo, depois Agente 4.
+    Roda Agentes em paralelo, depois Agente 4.
     """
     print(f"\n🔍 Analisando: {url[:60]}...")
 
-    # ── Agentes 1, 2, 3 em paralelo ──────────────────────────
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        future_crux   = executor.submit(agent1_crux.run, url)
-        future_schema = executor.submit(agent2_schema.run, url)
-        future_nlp    = executor.submit(agent3_nlp.run, url)
+    # ── Agentes em paralelo ──────────────────────────
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        future_crux      = executor.submit(agent1_crux.run, url)
+        future_pagespeed = executor.submit(agent1_pagespeed.run, url)
+        future_schema    = executor.submit(agent2_schema.run, url)
+        future_nlp       = executor.submit(agent3_nlp.run, url)
 
-        resultado_crux   = future_crux.result()
-        resultado_schema = future_schema.result()
-        resultado_nlp    = future_nlp.result()
+        resultado_crux      = future_crux.result()
+        resultado_pagespeed = future_pagespeed.result()
+        resultado_schema    = future_schema.result()
+        resultado_nlp       = future_nlp.result()
 
-    print(f"  ✓ Performance Score: {resultado_crux['score']}/100")
+    print(f"  ✓ CrUX Score:        {resultado_crux['score']}/100")
+    print(f"  ✓ PageSpeed Score:   {resultado_pagespeed['score']}/100")
     print(f"  ✓ Schema Score:      {resultado_schema['score']}/100")
     print(f"  ✓ NLP Score:         {resultado_nlp['score']}/100")
 
@@ -87,9 +90,10 @@ def analisar(url: str, query: str = None) -> dict:
         "ars": ars,
         "classificacao": classificacao,
         "agentes": {
-            "performance": resultado_crux,
-            "schema":      resultado_schema,
-            "conteudo":    resultado_nlp,
+            "crux":         resultado_crux,
+            "pagespeed":    resultado_pagespeed,
+            "schema":       resultado_schema,
+            "conteudo":     resultado_nlp,
             "gap_analysis": resultado_gap,
         },
         "recomendacoes": resultado_gap.get("recomendacoes", []),

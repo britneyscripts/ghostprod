@@ -28,6 +28,14 @@ app = FastAPI(
     version="0.1.0"
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Isso permite que o seu Frontend (porta 3000) fale com o Backend (8000)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # CORS — permite o frontend chamar o backend
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
 
