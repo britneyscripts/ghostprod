@@ -157,7 +157,7 @@ ghostprod/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/ghostprod-io/ghostprod.git
+git clone https://github.com/britneyscripts/ghostprod.git
 cd ghostprod/backend
 
 # Instala dependências
