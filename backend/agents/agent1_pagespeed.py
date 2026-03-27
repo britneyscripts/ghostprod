@@ -25,6 +25,7 @@ Uso:
 
 import os
 import requests
+import time
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -61,6 +62,10 @@ def get_pagespeed(url, strategy="MOBILE"):
     Chama a PageSpeed Insights API v5.
     strategy: MOBILE ou DESKTOP
     Timeout de 60s — PSI pode demorar para sites lentos.
+    
+    RETRY AUTOMÁTICO:
+    - 429 Too Many Requests → retry com exponential backoff
+    - Máximo 3 tentativas (0s, 2s, 4s)
     """
     params = {
         "url": url,
@@ -71,14 +76,41 @@ def get_pagespeed(url, strategy="MOBILE"):
     if PSI_API_KEY:
         params["key"] = PSI_API_KEY
 
-    try:
-        response = requests.get(PSI_ENDPOINT, params=params, timeout=60)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.Timeout:
-        return {"erro": "timeout", "url": url}
-    except requests.exceptions.RequestException as e:
-        return {"erro": str(e), "url": url}
+    max_retries = 3
+    
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(PSI_ENDPOINT, params=params, timeout=60)
+            response.raise_for_status()
+            return response.json()
+
+        except requests.exceptions.Timeout:
+            return {"erro": "timeout", "url": url}
+        except requests.exceptions.RequestException as e:
+        # Pega a fofoca inteira do Google se houver uma resposta de erro
+            erro_detalhado = e.response.text if e.response is not None else str(e)
+        return {"erro": erro_detalhado, "url": url}
+            
+        # except requests.exceptions.HTTPError as e:
+        #     # Se for 429 (rate limit) e ainda tem tentativas, espera e retenta
+        #     if e.response.status_code == 429 and attempt < max_retries - 1:
+        #         wait_time = 2 ** attempt  # 1s, 2s, 4s
+        #         print(f"   ⏳ Rate limit atingido. Tentativa {attempt + 1}/{max_retries}.")
+        #         print(f"      Aguardando {wait_time}s antes de tentar novamente...")
+        #         time.sleep(wait_time)
+        #         continue
+        #     else:
+        #         # Se não é 429 ou esgotou tentativas, retorna erro
+        #         return {"erro": str(e), "url": url}
+                
+        # except requests.exceptions.Timeout:
+        #     return {"erro": "timeout", "url": url}
+            
+        # except requests.exceptions.RequestException as e:
+        #     return {"erro": str(e), "url": url}
+    
+    # Se chegou aqui, esgotou todas as tentativas
+    return {"erro": "429 - Rate limit excedido após 3 tentativas", "url": url}
 
 
 def processar_psi(dados, url, strategy):
