@@ -1,7 +1,13 @@
 """
 ghostprod — agents/agent1_pagespeed.py
 ─────────────────────────────────────────────────────────
-Agente 1 (v2): Performance Score via PageSpeed Insights API.
+Agente 1 (v3): Performance Score via PageSpeed Insights API.
+
+NOVO em v3: Retorna os 4 scores do Lighthouse separados
+  - Performance
+  - Accessibility
+  - Best Practices
+  - SEO
 
 Diferença em relação ao CrUX:
   PageSpeed (este arquivo) → dado sintético (lab)
@@ -63,14 +69,17 @@ def get_pagespeed(url, strategy="MOBILE"):
     strategy: MOBILE ou DESKTOP
     Timeout de 60s — PSI pode demorar para sites lentos.
     
-    RETRY AUTOMÁTICO:
-    - 429 Too Many Requests → retry com exponential backoff
-    - Máximo 3 tentativas (0s, 2s, 4s)
+    NOVO: Agora busca TODAS as categorias do Lighthouse:
+    - performance
+    - accessibility
+    - best-practices
+    - seo
     """
     params = {
         "url": url,
         "strategy": strategy,
-        "category": "performance",
+        # IMPORTANTE: Busca todas as categorias
+        "category": ["performance", "accessibility", "best-practices", "seo"],
         "locale": "pt-BR",
     }
     if PSI_API_KEY:
@@ -80,34 +89,17 @@ def get_pagespeed(url, strategy="MOBILE"):
     
     for attempt in range(max_retries):
         try:
-            response = requests.get(PSI_ENDPOINT, params=params, timeout=60)
+            response = requests.get(PSI_ENDPOINT, params=params, timeout=90)
             response.raise_for_status()
             return response.json()
 
         except requests.exceptions.Timeout:
             return {"erro": "timeout", "url": url}
+            
         except requests.exceptions.RequestException as e:
-        # Pega a fofoca inteira do Google se houver uma resposta de erro
+            # Pega a fofoca inteira do Google se houver uma resposta de erro
             erro_detalhado = e.response.text if e.response is not None else str(e)
-        return {"erro": erro_detalhado, "url": url}
-            
-        # except requests.exceptions.HTTPError as e:
-        #     # Se for 429 (rate limit) e ainda tem tentativas, espera e retenta
-        #     if e.response.status_code == 429 and attempt < max_retries - 1:
-        #         wait_time = 2 ** attempt  # 1s, 2s, 4s
-        #         print(f"   ⏳ Rate limit atingido. Tentativa {attempt + 1}/{max_retries}.")
-        #         print(f"      Aguardando {wait_time}s antes de tentar novamente...")
-        #         time.sleep(wait_time)
-        #         continue
-        #     else:
-        #         # Se não é 429 ou esgotou tentativas, retorna erro
-        #         return {"erro": str(e), "url": url}
-                
-        # except requests.exceptions.Timeout:
-        #     return {"erro": "timeout", "url": url}
-            
-        # except requests.exceptions.RequestException as e:
-        #     return {"erro": str(e), "url": url}
+            return {"erro": erro_detalhado, "url": url}
     
     # Se chegou aqui, esgotou todas as tentativas
     return {"erro": "429 - Rate limit excedido após 3 tentativas", "url": url}
@@ -117,6 +109,8 @@ def processar_psi(dados, url, strategy):
     """
     Extrai métricas relevantes da resposta PSI.
     Retorna score 0-100 e breakdown por métrica.
+    
+    NOVO: Extrai os 4 scores do Lighthouse separadamente.
     """
     if "erro" in dados:
         return {
@@ -124,17 +118,30 @@ def processar_psi(dados, url, strategy):
             "status": "erro",
             "erro": dados["erro"],
             "performance_score": 0,
+            "accessibility_score": 0,
+            "best_practices_score": 0,
+            "seo_score": 0,
             "metricas": {}
         }
 
     lighthouse = dados.get("lighthouseResult", {})
-
-    # Score geral de performance (0-1 → 0-100)
     categories = lighthouse.get("categories", {})
-    perf_score = categories.get("performance", {}).get("score")
-    performance_score = round(perf_score * 100) if perf_score is not None else 0
 
-    # Métricas individuais
+    # ════════════════════════════════════════════════════════
+    # SCORES DO LIGHTHOUSE (0-1 → 0-100)
+    # ════════════════════════════════════════════════════════
+    def extrair_score_categoria(categoria_key):
+        score = categories.get(categoria_key, {}).get("score")
+        return round(score * 100) if score is not None else 0
+
+    performance_score = extrair_score_categoria("performance")
+    accessibility_score = extrair_score_categoria("accessibility")
+    best_practices_score = extrair_score_categoria("best-practices")
+    seo_score = extrair_score_categoria("seo")
+
+    # ════════════════════════════════════════════════════════
+    # MÉTRICAS DE PERFORMANCE (Core Web Vitals)
+    # ════════════════════════════════════════════════════════
     audits = lighthouse.get("audits", {})
 
     def extrair_metrica(key):
@@ -184,8 +191,20 @@ def processar_psi(dados, url, strategy):
         "status": "ok",
         "strategy": strategy,
         "data_coleta": datetime.utcnow().isoformat(),
+        
+        # ════════════════════════════════════════════════════════
+        # SCORES LIGHTHOUSE (para os cards circulares do frontend)
+        # ════════════════════════════════════════════════════════
         "performance_score": performance_score,
+        "accessibility_score": accessibility_score,
+        "best_practices_score": best_practices_score,
+        "seo_score": seo_score,
+        
+        # ════════════════════════════════════════════════════════
+        # MÉTRICAS DETALHADAS (Core Web Vitals)
+        # ════════════════════════════════════════════════════════
         "metricas": metricas,
+        
         # Atalhos para os campos mais usados
         "lcp_ms":     lcp_raw["valor"],
         "cls_score":  cls_raw["valor"],
@@ -207,6 +226,8 @@ def run(url: str) -> dict:
     """
     Interface padrão do orquestrador.
     Retorna performance_score e métricas detalhadas.
+    
+    NOVO: Retorna os 4 scores do Lighthouse separados.
     """
     resultado = analisar_url(url, strategy="MOBILE")
 
@@ -214,6 +235,9 @@ def run(url: str) -> dict:
         return {
             "agente": "agent1_pagespeed",
             "score": 0,
+            "accessibility_score": 0,
+            "best_practices_score": 0,
+            "seo_score": 0,
             "status": "erro",
             "erro": resultado.get("erro", "erro desconhecido"),
             "metricas": {}
@@ -224,6 +248,18 @@ def run(url: str) -> dict:
         "score": resultado["performance_score"],
         "status": "ok",
         "strategy": resultado["strategy"],
+        
+        # ════════════════════════════════════════════════════════
+        # SCORES LIGHTHOUSE (NOVO)
+        # ════════════════════════════════════════════════════════
+        "performance_score": resultado["performance_score"],
+        "accessibility_score": resultado["accessibility_score"],
+        "best_practices_score": resultado["best_practices_score"],
+        "seo_score": resultado["seo_score"],
+        
+        # ════════════════════════════════════════════════════════
+        # CORE WEB VITALS
+        # ════════════════════════════════════════════════════════
         "lcp_ms":    resultado["lcp_ms"],
         "cls_score": resultado["cls_score"],
         "tbt_ms":    resultado["tbt_ms"],
@@ -232,6 +268,7 @@ def run(url: str) -> dict:
         "cls_display": resultado["cls_display"],
         "tbt_display": resultado["tbt_display"],
         "metricas": resultado["metricas"],
+        
         "nota": "dado sintético (lab) — Lighthouse via PSI API"
     }
 
@@ -249,20 +286,26 @@ if __name__ == "__main__":
 
     print(f"\n🔍 PageSpeed Insights API")
     print(f"   URL: {url[:70]}...")
-    print(f"   Aguarde — pode demorar até 60s...\n")
+    print(f"   Aguarde — pode demorar até 90s (buscando 4 categorias)...\n")
 
     resultado = run(url)
 
-    print(f"✅ Performance Score: {resultado['score']}/100")
-    print(f"   ({resultado.get('nota', '')})")
-    print()
-
-    metricas = resultado.get("metricas", {})
-    for key, dados in metricas.items():
-        emoji = {"bom": "✅", "precisa_melhorar": "⚠️", "ruim": "❌"}.get(
-            dados.get("classificacao", ""), "—"
-        )
-        print(f"   {emoji} {dados['nome']}: {dados['display']} ({dados['classificacao']})")
+    if resultado.get("status") == "erro":
+        print(f"❌ Erro: {resultado.get('erro')}")
+    else:
+        print(f"\n📊 LIGHTHOUSE SCORES:")
+        print(f"   ⚡ Performance:      {resultado['performance_score']}/100")
+        print(f"   ♿ Accessibility:    {resultado['accessibility_score']}/100")
+        print(f"   ✅ Best Practices:  {resultado['best_practices_score']}/100")
+        print(f"   🔍 SEO:             {resultado['seo_score']}/100")
+        
+        print(f"\n📈 CORE WEB VITALS:")
+        metricas = resultado.get("metricas", {})
+        for key, dados in metricas.items():
+            emoji = {"bom": "✅", "precisa_melhorar": "⚠️", "ruim": "❌"}.get(
+                dados.get("classificacao", ""), "—"
+            )
+            print(f"   {emoji} {dados['nome']}: {dados['display']} ({dados['classificacao']})")
 
     print()
     print(json.dumps(resultado, indent=2, ensure_ascii=False, default=str))
