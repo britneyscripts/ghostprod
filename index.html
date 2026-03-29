@@ -1,861 +1,1093 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ghostprod — Eva De Paula</title>
-<meta name="description" content="Pesquisa sobre agent-readiness em PDPs de e-commerce brasileiro. Por Eva De Paula, Senior Lead PM, ICMC/USP.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --void: #0a0a18;
-    --cyber: #0f0f28;
-    --purple: #6B21A8;
-    --purple-mid: #9333EA;
-    --purple-light: #C4B5FD;
-    --cyan: #06B6D4;
-    --cyan-dim: #0e7490;
-    --pink: #EC4899;
-    --white: #F0EDFF;
-    --muted: #7C6FA0;
-    --grid: rgba(107,33,168,0.08);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--void);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    overflow-x: hidden;
-    cursor: crosshair;
-  }
-
-  /* Grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Scanline */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -100%;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(transparent, rgba(6,182,212,0.15), transparent);
-    animation: scan 10s linear infinite;
-    pointer-events: none;
-    z-index: 999;
-  }
-
-  @keyframes scan {
-    0% { top: -3px; }
-    100% { top: 100%; }
-  }
-
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 32px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── HERO ── */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 80px 0 60px;
-  }
-
-  .eyebrow {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--cyan);
-    text-transform: uppercase;
-    margin-bottom: 32px;
-    opacity: 0;
-    animation: fadeUp 0.6s ease forwards 0.2s;
-  }
-
-  .hero-title {
-    font-family: 'Orbitron', monospace;
-    font-weight: 900;
-    font-size: clamp(52px, 10vw, 96px);
-    line-height: 0.95;
-    letter-spacing: -2px;
-    margin-bottom: 8px;
-    opacity: 0;
-    animation: fadeUp 0.6s ease forwards 0.4s;
-  }
-
-  .hero-title .ghost { color: var(--purple-mid); }
-  .hero-title .prod  { color: var(--cyan); }
-
-  .hero-sub {
-    font-family: 'Orbitron', monospace;
-    font-size: clamp(13px, 2vw, 18px);
-    color: var(--muted);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 48px;
-    opacity: 0;
-    animation: fadeUp 0.6s ease forwards 0.6s;
-  }
-
-  .hero-statement {
-    font-size: clamp(18px, 3vw, 26px);
-    font-weight: 300;
-    line-height: 1.6;
-    max-width: 640px;
-    color: var(--white);
-    margin-bottom: 56px;
-    opacity: 0;
-    animation: fadeUp 0.6s ease forwards 0.8s;
-  }
-
-  .hero-statement strong {
-    color: var(--cyan);
-    font-weight: 500;
-  }
-
-  .hero-ctas {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeUp 0.6s ease forwards 1s;
-  }
-
-  .btn-primary {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 14px 28px;
-    background: transparent;
-    border: 1px solid var(--cyan);
-    color: var(--cyan);
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-
-  .btn-primary:hover {
-    background: var(--cyan);
-    color: var(--void);
-  }
-
-  .btn-secondary {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 14px 28px;
-    background: transparent;
-    border: 1px solid var(--purple-mid);
-    color: var(--purple-light);
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-
-  .btn-secondary:hover {
-    background: var(--purple-mid);
-    color: var(--white);
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── DIVIDER ── */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--purple), var(--cyan), var(--purple), transparent);
-    margin: 0;
-    opacity: 0.4;
-  }
-
-  /* ── SECTION ── */
-  section {
-    padding: 96px 0;
-  }
-
-  .section-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 5px;
-    color: var(--cyan);
-    text-transform: uppercase;
-    margin-bottom: 48px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--cyan-dim), transparent);
-  }
-
-  /* ── PROBLEMA ── */
-  .problem-text {
-    font-size: clamp(20px, 3.5vw, 32px);
-    font-weight: 300;
-    line-height: 1.65;
-    max-width: 720px;
-  }
-
-  .problem-text em {
-    font-style: normal;
-    color: var(--purple-light);
-  }
-
-  .problem-text strong {
-    font-weight: 500;
-    color: var(--white);
-  }
-
-  .data-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2px;
-    margin-top: 64px;
-    border: 1px solid rgba(107,33,168,0.3);
-  }
-
-  .data-item {
-    padding: 32px 28px;
-    background: rgba(107,33,168,0.06);
-    border-right: 1px solid rgba(107,33,168,0.2);
-    transition: background 0.2s;
-  }
-
-  .data-item:last-child { border-right: none; }
-  .data-item:hover { background: rgba(107,33,168,0.12); }
-
-  .data-number {
-    font-family: 'Orbitron', monospace;
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--cyan);
-    display: block;
-    margin-bottom: 8px;
-  }
-
-  .data-label {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .data-source {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    color: rgba(124,111,160,0.5);
-    margin-top: 6px;
-    display: block;
-  }
-
-  /* ── RESULTADO REAL ── */
-  .score-card {
-    background: var(--cyber);
-    border: 1px solid rgba(107,33,168,0.4);
-    padding: 48px;
-    margin-bottom: 2px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .score-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: linear-gradient(var(--purple), var(--cyan));
-  }
-
-  .score-url {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 32px;
-    word-break: break-all;
-  }
-
-  .score-main {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 40px;
-  }
-
-  .score-number {
-    font-family: 'Orbitron', monospace;
-    font-size: 80px;
-    font-weight: 900;
-    color: var(--cyan);
-    line-height: 1;
-    text-shadow: 0 0 40px rgba(6,182,212,0.3);
-  }
-
-  .score-badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: #F59E0B;
-    border: 1px solid #F59E0B;
-    padding: 4px 12px;
-    text-transform: uppercase;
-  }
-
-  .score-bars {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-
-  .bar-item { }
-
-  .bar-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .bar-label span {
-    color: var(--white);
-    font-weight: 700;
-  }
-
-  .bar-track {
-    height: 3px;
-    background: rgba(255,255,255,0.08);
-    position: relative;
-  }
-
-  .bar-fill {
-    height: 100%;
-    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .bar-note {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 6px;
-    font-style: italic;
-  }
-
-  .score-insight {
-    margin-top: 32px;
-    padding: 20px 24px;
-    background: rgba(6,182,212,0.05);
-    border-left: 2px solid var(--cyan-dim);
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .score-insight strong { color: var(--white); }
-
-  /* ── STACK ── */
-  .stack-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2px;
-  }
-
-  .stack-item {
-    padding: 32px;
-    background: rgba(107,33,168,0.05);
-    border: 1px solid rgba(107,33,168,0.15);
-    transition: all 0.2s;
-  }
-
-  .stack-item:hover {
-    background: rgba(107,33,168,0.1);
-    border-color: rgba(107,33,168,0.4);
-  }
-
-  .stack-agent {
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: var(--cyan);
-    margin-bottom: 12px;
-  }
-
-  .stack-name {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--white);
-    margin-bottom: 8px;
-  }
-
-  .stack-desc {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .stack-tech {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .tech-tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    padding: 3px 8px;
-    background: rgba(107,33,168,0.2);
-    color: var(--purple-light);
-    letter-spacing: 1px;
-  }
-
-  /* ── PESQUISA ── */
-  .research-block {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-  }
-
-  .research-item {
-    padding: 40px;
-    background: rgba(6,182,212,0.04);
-    border: 1px solid rgba(6,182,212,0.12);
-  }
-
-  .research-icon {
-    font-family: 'Orbitron', monospace;
-    font-size: 28px;
-    color: var(--cyan);
-    margin-bottom: 16px;
-    opacity: 0.7;
-  }
-
-  .research-title {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--white);
-    margin-bottom: 10px;
-  }
-
-  .research-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  /* ── AUTORA ── */
-  .author-block {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 48px;
-    align-items: start;
-    padding: 56px;
-    background: var(--cyber);
-    border: 1px solid rgba(107,33,168,0.3);
-  }
-
-  .author-avatar {
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .author-name {
-    font-family: 'Orbitron', monospace;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 6px;
-  }
-
-  .author-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--cyan);
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-  }
-
-  .author-bio {
-    font-size: 15px;
-    color: var(--muted);
-    line-height: 1.75;
-    margin-bottom: 24px;
-    max-width: 560px;
-  }
-
-  .author-links {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .author-link {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--purple-light);
-    text-decoration: none;
-    border-bottom: 1px solid rgba(196,181,253,0.3);
-    padding-bottom: 2px;
-    transition: color 0.2s, border-color 0.2s;
-  }
-
-  .author-link:hover {
-    color: var(--cyan);
-    border-color: var(--cyan);
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    padding: 48px 0;
-    border-top: 1px solid rgba(107,33,168,0.2);
-  }
-
-  .footer-inner {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .footer-brand {
-    font-family: 'Orbitron', monospace;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
-  .footer-brand .g { color: var(--purple-mid); }
-  .footer-brand .p { color: var(--cyan); }
-
-  .footer-note {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 1px;
-  }
-
-  @media (max-width: 640px) {
-    .research-block { grid-template-columns: 1fr; }
-    .author-block { grid-template-columns: 1fr; }
-    .score-bars { grid-template-columns: 1fr; }
-    .data-row { grid-template-columns: 1fr 1fr; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ghostprod — Eva De Paula</title>
+  <meta name="description"
+    content="Pesquisa sobre agent-readiness em PDPs de e-commerce brasileiro. Por Eva De Paula, Senior Lead PM, ICMC/USP.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --void: #0a0a18;
+      --cyber: #0f0f28;
+      --purple: #6B21A8;
+      --purple-mid: #9333EA;
+      --purple-light: #C4B5FD;
+      --cyan: #06B6D4;
+      --cyan-dim: #0e7490;
+      --pink: #EC4899;
+      --white: #F0EDFF;
+      --muted: #7C6FA0;
+      --grid: rgba(107, 33, 168, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--void);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -100%;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(transparent, rgba(6, 182, 212, 0.15), transparent);
+      animation: scan 10s linear infinite;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes scan {
+      0% {
+        top: -3px;
+      }
+
+      100% {
+        top: 100%;
+      }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.2s;
+    }
+
+    .ghost-icon {
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.3s, float 3s ease-in-out infinite 1s, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .hero-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 400;
+      font-size: clamp(52px, 10vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.4s;
+    }
+
+    .hero-title .ghost {
+      color: var(--purple-mid);
+    }
+
+    .hero-title .prod {
+      color: var(--cyan);
+    }
+
+    .hero-title .io {
+      color: var(--pink);
+    }
+
+    .hero-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      margin: 24px auto;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.5s;
+    }
+
+    .hero-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.6s;
+    }
+
+    .hero-tagline {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.2;
+      letter-spacing: -0.05em;
+      margin-bottom: 32px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple-mid), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-statement {
+      font-size: clamp(14px, 2vw, 16px);
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 640px;
+      margin: 0 auto 56px;
+      color: var(--white);
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.8s;
+    }
+
+    .hero-statement strong {
+      color: var(--cyan);
+      font-weight: 500;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 1s;
+    }
+
+    .button-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag-small {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      opacity: 0.7;
+    }
+
+    .btn-primary {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      background: transparent;
+      border: 1px solid var(--purple-mid);
+      color: var(--purple-light);
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: not-allowed;
+      opacity: 0.6;
+      min-width: 260px;
+      text-align: center;
+    }
+
+    .btn-primary:hover {
+      background: var(--purple-mid);
+      color: var(--white);
+    }
+
+    .btn-secondary {
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      background: transparent;
+      border: 1px solid var(--purple-mid);
+      color: var(--purple-light);
+      text-decoration: none;
+      transition: all 0.2s;
+      min-width: 260px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .btn-secondary:hover {
+      background: var(--purple-mid);
+      color: var(--white);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--purple), var(--cyan), var(--purple), transparent);
+      margin: 0;
+      opacity: 0.4;
+    }
+
+    /* ── SECTION ── */
+    section {
+      padding: 96px 0;
+    }
+
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 5px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--cyan-dim), transparent);
+    }
+
+    /* ── PROBLEMA ── */
+    .problem-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.8;
+      max-width: 720px;
+      margin: 0 auto;
+      text-align: justify;
+      color: var(--cyan);
+    }
+
+    .problem-text em {
+      font-style: normal;
+      color: var(--purple-light);
+    }
+
+    .problem-text strong {
+      font-weight: 500;
+      color: var(--white);
+    }
+
+    .data-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+      margin-top: 64px;
+      border: 1px solid rgba(107, 33, 168, 0.3);
+    }
+
+    .data-item {
+      padding: 32px 28px;
+      background: rgba(107, 33, 168, 0.06);
+      border-right: 1px solid rgba(107, 33, 168, 0.2);
+      transition: background 0.2s;
+    }
+
+    .data-item:last-child {
+      border-right: none;
+    }
+
+    .data-item:hover {
+      background: rgba(107, 33, 168, 0.12);
+    }
+
+    .data-number {
+      font-family: 'Orbitron', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--cyan);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .data-label {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .data-source {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      color: rgba(124, 111, 160, 0.5);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* ── RESULTADO REAL ── */
+    .score-card {
+      background: var(--cyber);
+      border: 1px solid rgba(107, 33, 168, 0.4);
+      padding: 48px;
+      margin-bottom: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(var(--purple), var(--cyan));
+    }
+
+    .score-url {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      word-break: break-all;
+    }
+
+    .score-main {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .score-number {
+      font-family: 'Orbitron', monospace;
+      font-size: 80px;
+      font-weight: 900;
+      color: var(--cyan);
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(6, 182, 212, 0.3);
+    }
+
+    .score-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #F59E0B;
+      border: 1px solid #F59E0B;
+      padding: 4px 12px;
+      text-transform: uppercase;
+    }
+
+    .score-bars {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .bar-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .bar-label span {
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    .bar-track {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bar-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .score-insight {
+      margin-top: 32px;
+      padding: 20px 24px;
+      background: rgba(6, 182, 212, 0.05);
+      border-left: 2px solid var(--cyan-dim);
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .score-insight strong {
+      color: var(--white);
+    }
+
+    /* ── STACK ── */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2px;
+    }
+
+    .stack-item {
+      padding: 32px;
+      background: rgba(107, 33, 168, 0.05);
+      border: 1px solid rgba(107, 33, 168, 0.15);
+      transition: all 0.2s;
+    }
+
+    .stack-item:hover {
+      background: rgba(107, 33, 168, 0.1);
+      border-color: rgba(107, 33, 168, 0.4);
+    }
+
+    .stack-agent {
+      font-family: 'Orbitron', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      margin-bottom: 12px;
+    }
+
+    .stack-name {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .stack-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .stack-tech {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tech-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 9px;
+      padding: 3px 8px;
+      background: rgba(107, 33, 168, 0.2);
+      color: var(--purple-light);
+      letter-spacing: 1px;
+    }
+
+    /* ── PESQUISA ── */
+    .research-block {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .research-item {
+      padding: 48px 32px;
+      background: rgba(6, 182, 212, 0.04);
+      border: 1px solid rgba(6, 182, 212, 0.12);
+      min-height: 280px;
+    }
+
+    .research-icon {
+      font-family: 'Orbitron', monospace;
+      font-size: 28px;
+      color: var(--cyan);
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+
+    .research-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .research-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ── AUTORA ── */
+    .author-block {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 48px;
+      align-items: start;
+      padding: 56px;
+      background: var(--cyber);
+      border: 1px solid rgba(107, 33, 168, 0.3);
+    }
+
+    .author-avatar {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .author-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .author-bio {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.75;
+      margin-bottom: 24px;
+      max-width: 560px;
+    }
+
+    .author-links {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .author-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(196, 181, 253, 0.3);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .author-link:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid rgba(107, 33, 168, 0.2);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-brand {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .footer-brand .g {
+      color: var(--purple-mid);
+    }
+
+    .footer-brand .p {
+      color: var(--cyan);
+    }
+
+    .footer-note {
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .research-block {
+        grid-template-columns: 1fr;
+      }
+
+      .author-block {
+        grid-template-columns: 1fr;
+      }
+
+      .score-bars {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .data-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stack-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="container">
-    <p class="eyebrow">// pesquisa em andamento · ICMC/USP · 2026</p>
-    <h1 class="hero-title">
-      <span class="ghost">ghost</span><span class="prod">prod</span>
-    </h1>
-    <p class="hero-sub">Agent-Readiness Score · PDPs · E-commerce BR</p>
-    <p class="hero-statement">
-      <strong>6,1 milhões de visitas</strong> chegaram aos maiores e-commerces brasileiros via ChatGPT em 2025.<br>
-      Os agentes recomendam o que conseguem ler.<br>
-      <em>A maioria das páginas de produto não passa no teste.</em>
-    </p>
-    <div class="hero-ctas">
-      <a href="https://github.com/britneyscripts/ghostprod" class="btn-primary" target="_blank">→ Ver repositório</a>
-      <a href="https://substack.com/@evadepaula" class="btn-secondary" target="_blank">→ Agentic Commerce</a>
-    </div>
-  </div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">// pesquisa em andamento · ICMC/USP · 2026</p>
 
-<div class="divider"></div>
-
-<!-- PROBLEMA -->
-<section>
-  <div class="container">
-    <p class="section-label">01 · o problema</p>
-    <p class="problem-text">
-      A descoberta de produtos está migrando de motores de busca para <em>agentes de IA</em>.
-      Esses agentes leem, interpretam e recomendam — mas só o que conseguem parsear.
-      <strong>Performance técnica ruim, Schema.org ausente e descrições sem atributos verificáveis
-      tornam uma PDP semanticamente invisível.</strong>
-      O produto existe no servidor. Para o agente, não existe.
-    </p>
-
-    <div class="data-row">
-      <div class="data-item">
-        <span class="data-number">6,1M</span>
-        <span class="data-label">visitas de referência do ChatGPT aos 10 maiores e-commerces BR</span>
-        <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
-      </div>
-      <div class="data-item">
-        <span class="data-number">302%</span>
-        <span class="data-label">crescimento de tráfego de IA para e-commerce em 2025</span>
-        <span class="data-source">Alhena.ai · 2025</span>
-      </div>
-      <div class="data-item">
-        <span class="data-number">3º</span>
-        <span class="data-label">Brasil é o 3º maior mercado de IA generativa do mundo</span>
-        <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
-      </div>
-      <div class="data-item">
-        <span class="data-number">99%</span>
-        <span class="data-label">market share do ChatGPT entre ferramentas generativas no Brasil</span>
-        <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- RESULTADO REAL -->
-<section>
-  <div class="container">
-    <p class="section-label">02 · resultado real · ao vivo</p>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:32px;font-family:'Space Mono',monospace;">
-      Análise rodada ao vivo em 27/03/2026 · Pipeline Python + Playwright + CrUX API + spaCy
-      · <span style="color:var(--purple-light);">@naturaoficial</span> · <span style="color:var(--purple-light);">@oboticario</span> — dados públicos, PDPs abertas
-    </p>
-
-    <div class="score-card">
-      <p class="score-url">→ https://www.natura.com.br/p/serum-intensivo-multiclareador-chronos-derma-30-ml/NATBRA-169222</p>
-      <div class="score-main">
-        <span class="score-number">53</span>
-        <span class="score-badge">⚠ Em risco</span>
-      </div>
-
-      <div class="score-bars">
-        <div class="bar-item">
-          <div class="bar-label">Performance <span>0/100</span></div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:0%;background:#EF4444;"></div>
-          </div>
-          <p class="bar-note">URL sem dados CrUX — threshold de tráfego não atingido</p>
-        </div>
-        <div class="bar-item">
-          <div class="bar-label">Schema.org <span>84/100</span></div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:84%;background:#8B5CF6;"></div>
-          </div>
-          <p class="bar-note">10 de 16 campos presentes — falta gtin, color, FAQPage</p>
-        </div>
-        <div class="bar-item">
-          <div class="bar-label">Conteúdo NLP <span>97/100</span></div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:97%;background:#06B6D4;"></div>
-          </div>
-          <p class="bar-note">60 atributos técnicos — niacinamida, ácido tranexâmico, fps</p>
-        </div>
-      </div>
-
-      <div class="score-insight">
-        <strong>Diagnóstico:</strong> a Natura tem conteúdo rico e Schema presente — mas a URL específica da PDP não atinge o threshold mínimo de tráfego para gerar dados na CrUX API do Google. Esse é um achado metodológico real: a cobertura da CrUX em PDPs individuais é uma variável relevante para o modelo.
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- STACK -->
-<section>
-  <div class="container">
-    <p class="section-label">03 · o que foi construído</p>
-
-    <div class="stack-grid">
-      <div class="stack-item">
-        <p class="stack-agent">AGENTE 01</p>
-        <p class="stack-name">Performance</p>
-        <p class="stack-desc">Dados de campo reais via Chrome UX Report API. Percentil p75 de LCP, INP, CLS e TTFB.</p>
-        <div class="stack-tech">
-          <span class="tech-tag">CrUX API</span>
-          <span class="tech-tag">Python</span>
-          <span class="tech-tag">p75</span>
-        </div>
-      </div>
-      <div class="stack-item">
-        <p class="stack-agent">AGENTE 02</p>
-        <p class="stack-name">Schema.org</p>
-        <p class="stack-desc">Playwright renderiza a PDP com Chromium headless — resolve CSR e VTEX IO. Extrai e avalia completude do JSON-LD.</p>
-        <div class="stack-tech">
-          <span class="tech-tag">Playwright</span>
-          <span class="tech-tag">BeautifulSoup</span>
-          <span class="tech-tag">JSON-LD</span>
-        </div>
-      </div>
-      <div class="stack-item">
-        <p class="stack-agent">AGENTE 03</p>
-        <p class="stack-name">Conteúdo NLP</p>
-        <p class="stack-desc">Mede densidade de atributos técnicos verificáveis vs. marketing gloss. Modelo em português.</p>
-        <div class="stack-tech">
-          <span class="tech-tag">spaCy pt</span>
-          <span class="tech-tag">NLP</span>
-          <span class="tech-tag">regex</span>
-        </div>
-      </div>
-      <div class="stack-item">
-        <p class="stack-agent">AGENTE 04</p>
-        <p class="stack-name">Gap Analysis</p>
-        <p class="stack-desc">Simula o raciocínio de um agente real. Responde: com esses dados, esse produto seria recomendado para "sérum para pele oleosa"?</p>
-        <div class="stack-tech">
-          <span class="tech-tag">Claude API</span>
-          <span class="tech-tag">FastAPI</span>
-          <span class="tech-tag">Python</span>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:48px;padding:40px;background:rgba(107,33,168,0.06);border:1px solid rgba(107,33,168,0.2);text-align:center;">
-      <p style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);letter-spacing:3px;margin-bottom:16px;">COMO É CALCULADO?</p>
-      <p style="font-size:18px;color:var(--muted);line-height:1.8;margin-bottom:24px;">
-        O Agent-Readiness Score combina três variáveis técnicas em um número de 0 a 100.<br>
-        Os pesos são o que a pesquisa está descobrindo.<br>
-        <em style="color:var(--purple-light);">Isso é a tese.</em>
-      </p>
-      <a href="https://www.linkedin.com/in/evadepaula" target="_blank" style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 32px;background:transparent;border:1px solid var(--purple-mid);color:var(--purple-light);text-decoration:none;display:inline-block;transition:all 0.2s;" onmouseover="this.style.background='var(--purple-mid)';this.style.color='white'" onmouseout="this.style.background='transparent';this.style.color='var(--purple-light)'">quer saber? fala comigo →</a>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- PESQUISA -->
-<section>
-  <div class="container">
-    <p class="section-label">04 · a pesquisa</p>
-
-    <div class="research-block">
-      <div class="research-item">
-        <p class="research-icon">∂</p>
-        <p class="research-title">Tese · ICMC/USP</p>
-        <p class="research-desc">MBA em Ciência de Dados. Hipótese: as três variáveis têm pesos diferentes na predição de invisibilidade semântica para agentes de Level 1. O ghostprod é o instrumento de coleta de dados. Modelo: regressão logística + SHAP values.</p>
-      </div>
-      <div class="research-item">
-        <p class="research-icon">◈</p>
-        <p class="research-title">Série Substack</p>
-        <p class="research-desc">Agentic Commerce — artigos com dados originais sobre como agentes de IA leem o e-commerce brasileiro. Dois artigos publicados. Cada publicação tem dado verificável, hipótese testável ou experimento replicável.</p>
-      </div>
-      <div class="research-item">
-        <p class="research-icon">⟁</p>
-        <p class="research-title">Descoberta ao vivo</p>
-        <p class="research-desc">Boticário usa VTEX com CSR — Schema carrega via JavaScript, agentes com timeout curto dão zero. Jumbo (Cencosud) tem FAQPage aninhada no Schema.org com ingredientes, alérgenos e porções. Mesma plataforma VTEX, implementação completamente diferente.</p>
-      </div>
-      <div class="research-item">
-        <p class="research-icon">⌬</p>
-        <p class="research-title">Dado de campo</p>
-        <p class="research-desc">CrUX API confirma: a maioria das PDPs individuais não atinge o threshold mínimo de tráfego Chrome para gerar dados de campo. Isso é uma limitação metodológica real — e um ponto cego de todos os concorrentes que usam CrUX.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- AUTORA -->
-<section>
-  <div class="container">
-    <p class="section-label">05 · quem construiu isso</p>
-
-    <div class="author-block">
-      <div class="author-avatar">
-        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C7.58 2 4 5.58 4 10V22L7 19L10 22L12 20L14 22L17 19L20 22V10C20 5.58 16.42 2 12 2Z" stroke="#9333EA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="rgba(147,51,234,0.15)"/>
-          <circle cx="9" cy="10" r="1.5" fill="#9333EA"/>
-          <circle cx="15" cy="10" r="1.5" fill="#9333EA"/>
-          <ellipse cx="8.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7"/>
-          <ellipse cx="15.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7"/>
-          <path d="M10 14.5C10.5 15.5 13.5 15.5 14 14.5" stroke="#9333EA" stroke-width="1" stroke-linecap="round"/>
+      <div class="ghost-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+          style="filter: drop-shadow(0 0 20px rgba(236,72,153,0.6));">
+          <path d="M12 2C7.58 2 4 5.58 4 10V22L7 19L10 22L12 20L14 22L17 19L20 22V10C20 5.58 16.42 2 12 2Z"
+            stroke="#EC4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+            fill="rgba(236,72,153,0.2)" />
+          <circle cx="9" cy="10" r="1.5" fill="#EC4899" />
+          <circle cx="15" cy="10" r="1.5" fill="#EC4899" />
+          <ellipse cx="8.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7" />
+          <ellipse cx="15.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7" />
+          <path d="M10 14.5C10.5 15.5 13.5 15.5 14 14.5" stroke="#EC4899" stroke-width="1" stroke-linecap="round" />
         </svg>
       </div>
-      <div>
-        <p class="author-name">Eva De Paula</p>
-        <p class="author-title">// Senior Lead PM · Orquestradora · Curiosa</p>
-        <p class="author-bio">
-          7+ anos em e-commerce e dados em LATAM — <strong style="color:var(--white)">3 anos na VTEX</strong>, Cencosud, Ricoh, iGaming.
-          Na VTEX acompanhou e-commerces de todos os portes analisando performance de front,
-          Core Web Vitals e comportamento de tráfego. Na Cencosud construiu o pipeline
-          CrUX → BigQuery → Looker Studio monitorando PDPs em múltiplos países.
-          Identificou crescimento de tráfego de agentes de IA no GA4 antes de ser tendência.
-          Está transformando essa observação em pesquisa acadêmica e em produto.
-        </p>
-        <div style="margin-bottom:24px;padding:20px 24px;background:rgba(107,33,168,0.08);border:1px solid rgba(107,33,168,0.2);">
-          <p style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--cyan);margin-bottom:12px;">FEITO COM CARINHO POR</p>
-          <p style="font-size:13px;color:var(--muted);line-height:2.2;">
-            💜 <strong style="color:var(--white)">Eva Bettina</strong> 🧠 Senior PM · Orquestradora · Curiosa<br>
-            🤍 <strong style="color:var(--white)">Claude (Anthropic)</strong> — Arquitetura · Código · Documentação<br>
-            💙 <strong style="color:var(--white)">Gemini (Google)</strong> — Gap Analysis · UI Prototyping<br>
-            🩵 <strong style="color:var(--white)">AI Studio (Google)</strong> — Frontend vaporwave<br>
-            💜 <strong style="color:var(--white)">Opal (Google Labs)</strong> — Prototipagem visual
-          </p>
-          <p style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(124,111,160,0.5);margin-top:12px;font-style:italic;">"A melhor stack é a que resolve o problema — com ou sem framework."</p>
+
+      <h1 class="hero-title">
+        <span class="ghost">ghost</span><span class="prod">prod</span><span class="io">.io</span>
+      </h1>
+
+      <div class="hero-divider"></div>
+
+      <p class="hero-sub">Agent-Readiness Score · PDPs · E-commerce BR</p>
+
+      <div
+        style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; opacity: 0; animation: fadeUp 0.6s ease forwards 0.7s;">
+        <span
+          style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 6px 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--cyan-dim); color: var(--cyan); text-transform: uppercase;">v0.1
+          BETA</span>
+        <span
+          style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 6px 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--cyan-dim); color: var(--cyan); text-transform: uppercase;">MIT</span>
+        <span
+          style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 6px 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--cyan-dim); color: var(--cyan); text-transform: uppercase;">BRASIL</span>
+        <span
+          style="font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; padding: 6px 12px; background: rgba(6,182,212,0.1); border: 1px solid var(--cyan-dim); color: var(--cyan); text-transform: uppercase;">ICMC/USP</span>
+      </div>
+
+      <p class="hero-tagline" style="opacity: 0; animation: fadeUp 0.6s ease forwards 0.75s;">
+        Visível para humanos.<br>
+        Invisível para agentes.
+      </p>
+
+      <p class="hero-statement">
+        <strong>A nova fronteira do e-commerce não é o SEO tradicional. É a otimização para Inteligência
+          Artificial.</strong><br><br>
+        A descoberta de produtos mudou. Motores de busca estão dando lugar a agentes generativos que leem, interpretam e
+        decidem o que recomendar. O Ghostprod audita a invisibilidade semântica do seu catálogo para garantir que ele
+        seja a primeira escolha dos LLMs.
+      </p>
+
+      <div class="hero-ctas">
+        <div class="button-wrapper">
+          <span class="tag-small">em breve</span>
+          <button class="btn-primary" disabled>Ver Plataforma</button>
         </div>
-        <div class="author-links">
-          <a href="https://linkedin.com/in/evadepaula" class="author-link" target="_blank">LinkedIn</a>
-          <a href="https://substack.com/@evadepaula" class="author-link" target="_blank">Substack</a>
-          <a href="https://github.com/britneyscripts/ghostprod" class="author-link" target="_blank">GitHub @britneyscripts</a>
+        <a href="https://github.com/britneyscripts" class="btn-secondary" target="_blank">Visitar Repositório GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROBLEMA -->
+  <section>
+    <div class="container">
+      <p class="section-label">01 · o problema e a estratégia</p>
+      <p class="problem-text">
+        A inteligência de dados aplicada a negócios exige mais do que atrair tráfego; exige garantir o posicionamento
+        nos novos ecossistemas de IA. Hoje, <em>agentes como ChatGPT e Gemini</em> decidem quais produtos comparar
+        baseados puramente na densidade de dados estruturados e na performance técnica da sua página.
+        <strong>Performance técnica ruim, Schema.org ausente e descrições sem atributos verificáveis tornam uma PDP
+          semanticamente invisível.</strong> O produto existe no seu servidor, mas para o modelo de linguagem que vai
+        recomendar a compra, ele simplesmente não existe.
+      </p>
+
+      <div class="data-row">
+        <div class="data-item">
+          <span class="data-number">6,1M</span>
+          <span class="data-label">visitas de referência do ChatGPT aos 10 maiores e-commerces BR</span>
+          <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
+        </div>
+        <div class="data-item">
+          <span class="data-number">302%</span>
+          <span class="data-label">crescimento de tráfego de IA para e-commerce em 2025</span>
+          <span class="data-source">Alhena.ai · 2025</span>
+        </div>
+        <div class="data-item">
+          <span class="data-number">3º</span>
+          <span class="data-label">Brasil é o 3º maior mercado de IA generativa do mundo</span>
+          <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
+        </div>
+        <div class="data-item">
+          <span class="data-number">99%</span>
+          <span class="data-label">market share do ChatGPT entre ferramentas generativas no Brasil</span>
+          <span class="data-source">Cadastra + Similarweb · nov. 2025</span>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="divider"></div>
+  <div class="divider"></div>
 
-<footer>
-  <div class="container">
-    <div class="footer-inner">
-      <span class="footer-brand"><span class="g">ghost</span><span class="p">prod</span></span>
-      <span class="footer-note">v0.1 beta · ICMC/USP · Porto Alegre · 2026</span>
-      <span class="footer-note">[ SIGNAL: BUILDING ]</span>
+  <!-- RESULTADO REAL -->
+  <section>
+    <div class="container">
+      <p class="section-label">02 · resultado real · ao vivo</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:32px;font-family:'Space Mono',monospace;">
+        Análise rodada ao vivo em 27/03/2026 · Pipeline Python + Playwright + CrUX API + spaCy
+        · <span style="color:var(--purple-light);">@naturaoficial</span> — dados públicos, PDPs abertas
+      </p>
+
+      <div class="score-card">
+        <p class="score-url">→
+          https://www.natura.com.br/p/serum-intensivo-multiclareador-chronos-derma-30-ml/NATBRA-169222</p>
+        <div class="score-main">
+          <span class="score-number">53</span>
+          <span class="score-badge">⚠ Em risco</span>
+        </div>
+
+        <div class="score-bars">
+          <div class="bar-item">
+            <div class="bar-label">CrUX Field <span>0/100</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:0%;background:#EF4444;"></div>
+            </div>
+            <p class="bar-note">Threshold não atingido</p>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">PageSpeed Lab <span>43/100</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:43%;background:#ffa400;"></div>
+            </div>
+            <p class="bar-note">4 métricas Lighthouse</p>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Schema.org <span>84/100</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:84%;background:#8B5CF6;"></div>
+            </div>
+            <p class="bar-note">10/16 campos presentes</p>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label">Conteúdo NLP <span>97/100</span></div>
+            <div class="bar-track">
+              <div class="bar-fill" style="width:97%;background:#06B6D4;"></div>
+            </div>
+            <p class="bar-note">60 atributos técnicos</p>
+          </div>
+        </div>
+
+        <div class="score-insight">
+          <strong>Diagnóstico:</strong> a Natura tem conteúdo rico e Schema presente — mas a URL específica da PDP não
+          atinge o threshold mínimo de tráfego para gerar dados na CrUX API do Google. Esse é um achado metodológico
+          real: a cobertura da CrUX em PDPs individuais é uma variável relevante para o modelo.
+        </div>
+      </div>
     </div>
-  </div>
-</footer>
+  </section>
 
-<script>
-  // Anima as barras quando entram na viewport
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => {
-      if (el.isIntersecting) {
-        el.target.style.width = el.target.dataset.width;
-      }
+  <div class="divider"></div>
+
+  <!-- STACK -->
+  <section>
+    <div class="container">
+      <p class="section-label">03 · engenharia de dados: sob o capô</p>
+      <p
+        style="font-size: 16px; font-weight: 300; line-height: 1.65; max-width: 720px; margin: 0 auto 48px; color: var(--muted); text-align: justify;">
+        A invisibilidade não se resolve com achismos, mas com orquestração de dados. O motor do Ghostprod executa um
+        pipeline determinístico que cruza dados de campo reais (CrUX) com testes sintéticos em tempo real, validação de
+        JSON-LD e processamento de linguagem natural (NLP). É a engenharia traduzindo o caos do código em inteligência
+        acionável.
+      </p>
+
+      <div class="stack-grid">
+        <div class="stack-item">
+          <p class="stack-agent">AGENTE 01</p>
+          <p class="stack-name">CrUX Field Data</p>
+          <p class="stack-desc">Dados de campo reais via Chrome UX Report API. Percentil p75 de LCP, INP, CLS e TTFB.
+          </p>
+          <div class="stack-tech">
+            <span class="tech-tag">CrUX API</span>
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">p75</span>
+          </div>
+        </div>
+        <div class="stack-item">
+          <p class="stack-agent">AGENTE 02</p>
+          <p class="stack-name">PageSpeed Lab</p>
+          <p class="stack-desc">4 scores do Lighthouse (Performance, Accessibility, Best Practices, SEO) via PageSpeed
+            Insights API.</p>
+          <div class="stack-tech">
+            <span class="tech-tag">PageSpeed API</span>
+            <span class="tech-tag">Lighthouse</span>
+            <span class="tech-tag">Lab Data</span>
+          </div>
+        </div>
+        <div class="stack-item">
+          <p class="stack-agent">AGENTE 03</p>
+          <p class="stack-name">Schema.org</p>
+          <p class="stack-desc">Playwright renderiza a PDP com Chromium headless — resolve CSR e VTEX IO. Extrai e
+            avalia completude do JSON-LD.</p>
+          <div class="stack-tech">
+            <span class="tech-tag">Playwright</span>
+            <span class="tech-tag">BeautifulSoup</span>
+            <span class="tech-tag">JSON-LD</span>
+          </div>
+        </div>
+        <div class="stack-item">
+          <p class="stack-agent">AGENTE 04</p>
+          <p class="stack-name">Conteúdo NLP</p>
+          <p class="stack-desc">Mede densidade de atributos técnicos verificáveis vs. marketing gloss. Modelo em
+            português.</p>
+          <div class="stack-tech">
+            <span class="tech-tag">spaCy pt</span>
+            <span class="tech-tag">NLP</span>
+            <span class="tech-tag">regex</span>
+          </div>
+        </div>
+        <div class="stack-item">
+          <p class="stack-agent">AGENTE 05</p>
+          <p class="stack-name">Gap Analysis</p>
+          <p class="stack-desc">Simula o raciocínio de um agente real. Responde: com esses dados, esse produto seria
+            recomendado para "sérum para pele oleosa"?</p>
+          <div class="stack-tech">
+            <span class="tech-tag">Claude API</span>
+            <span class="tech-tag">FastAPI</span>
+            <span class="tech-tag">Python</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="margin-top:48px;padding:40px;background:rgba(107,33,168,0.06);border:1px solid rgba(107,33,168,0.2);text-align:center;">
+        <p
+          style="font-family:'Orbitron',monospace;font-size:13px;color:var(--cyan);letter-spacing:3px;margin-bottom:16px;">
+          COMO É CALCULADO?</p>
+        <p style="font-size:18px;color:var(--muted);line-height:1.8;margin-bottom:24px;">
+          O Agent-Readiness Score combina três variáveis técnicas em um número de 0 a 100.<br>
+          Os pesos são o que a pesquisa está descobrindo.<br>
+          <em style="color:var(--purple-light);">Isso é a tese.</em>
+        </p>
+        <a href="https://www.linkedin.com/in/eva-de-paula/" target="_blank"
+          style="font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:14px 32px;background:transparent;border:1px solid var(--purple-mid);color:var(--purple-light);text-decoration:none;display:inline-block;transition:all 0.2s;"
+          onmouseover="this.style.background='var(--purple-mid)';this.style.color='white'"
+          onmouseout="this.style.background='transparent';this.style.color='var(--purple-light)'">quer saber mais? fala
+          comigo →</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PESQUISA -->
+  <section>
+    <div class="container">
+      <p class="section-label">04 · rigor acadêmico: a metodologia</p>
+
+      <div class="research-block">
+        <div class="research-item">
+          <p class="research-icon">∂</p>
+          <p class="research-title">Tese · ICMC/USP</p>
+          <p class="research-desc">MBA em Ciência de Dados. Hipótese: as três variáveis têm pesos diferentes na predição
+            de invisibilidade semântica para agentes de Level 1. O ghostprod é o instrumento de coleta de dados. Modelo:
+            regressão logística + SHAP values.</p>
+        </div>
+        <div class="research-item">
+          <p class="research-icon">◈</p>
+          <p class="research-title">Série Substack</p>
+          <p class="research-desc">Agentic Commerce — artigos com dados originais sobre como agentes de IA leem o
+            e-commerce brasileiro. Dois artigos publicados. Cada publicação tem dado verificável, hipótese testável ou
+            experimento replicável.</p>
+        </div>
+        <div class="research-item">
+          <p class="research-icon">⌬</p>
+          <p class="research-title">Dado de campo</p>
+          <p class="research-desc">CrUX API confirma: a maioria das PDPs individuais não atinge o threshold mínimo de
+            tráfego Chrome para gerar dados de campo. Isso é uma limitação metodológica real — e um ponto cego de todos
+            os concorrentes que usam CrUX.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AUTORA -->
+  <section>
+    <div class="container">
+      <p class="section-label">05 · quem lidera o projeto</p>
+
+      <div class="author-block">
+        <div class="author-avatar">
+          <svg width="72" height="72" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C7.58 2 4 5.58 4 10V22L7 19L10 22L12 20L14 22L17 19L20 22V10C20 5.58 16.42 2 12 2Z"
+              stroke="#9333EA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              fill="rgba(147,51,234,0.15)" />
+            <circle cx="9" cy="10" r="1.5" fill="#9333EA" />
+            <circle cx="15" cy="10" r="1.5" fill="#9333EA" />
+            <ellipse cx="8.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7" />
+            <ellipse cx="15.5" cy="12" rx="1.5" ry="1" fill="#06B6D4" opacity="0.7" />
+            <path d="M10 14.5C10.5 15.5 13.5 15.5 14 14.5" stroke="#9333EA" stroke-width="1" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div>
+          <p class="author-name">Eva De Paula</p>
+          <p class="author-title">// Senior Lead PM · Orquestradora · Curiosa</p>
+          <p class="author-bio">
+            7+ anos liderando produtos digitais e dados na América Latina. Com uma base técnica sólida (MBA em Eng. de
+            Software e especialização em Data Intelligence), possui experiência profunda trabalhando com a plataforma
+            <strong style="color:var(--white)">VTEX</strong> e grandes operações de varejo. Construiu pipelines
+            complexos de dados — cruzando CrUX API, BigQuery e Looker Studio — para monitorar a performance de PDPs em
+            múltiplos países simultaneamente. Identificou a migração do tráfego de busca para agentes de IA muito antes
+            de virar tendência e, hoje, transforma essa visão em pesquisa de fronteira na USP e em produto real.
+          </p>
+          <div
+            style="margin-bottom:24px;padding:20px 24px;background:rgba(107,33,168,0.08);border:1px solid rgba(107,33,168,0.2);">
+            <p
+              style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--cyan);margin-bottom:12px;">
+              FEITO COM CARINHO POR</p>
+            <p style="font-size:13px;color:var(--muted);line-height:2.2;">
+              💜 <strong style="color:var(--white)">Eva Bettina</strong> 🧠 Senior PM · Orquestradora · Curiosa<br>
+              🤍 <strong style="color:var(--white)">Claude (Anthropic)</strong> — Arquitetura · Código ·
+              Documentação<br>
+              💙 <strong style="color:var(--white)">Gemini (Google)</strong> — Gap Analysis · UI Prototyping<br>
+              🩵 <strong style="color:var(--white)">AI Studio (Google)</strong> — Frontend vaporwave<br>
+              💜 <strong style="color:var(--white)">Opal (Google Labs)</strong> — Prototipagem visual
+            </p>
+            <p
+              style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(124,111,160,0.5);margin-top:12px;font-style:italic;">
+              "A melhor stack é a que resolve o problema — com ou sem framework."</p>
+          </div>
+          <div class="author-links">
+            <a href="https://linkedin.com/in/evadepaula" class="author-link" target="_blank">LinkedIn</a>
+            <a href="https://x.com/britneyscripts" class="author-link" target="_blank">Twitter</a>
+            <a href="https://substack.com/@evadepaula" class="author-link" target="_blank">Substack</a>
+            <a href="https://github.com/britneyscripts" class="author-link" target="_blank">GitHub @britneyscripts</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-brand"><span class="g">ghost</span><span class="p">prod</span></span>
+        <span class="footer-note">v0.1 beta · ICMC/USP · Porto Alegre · 2026</span>
+        <span class="footer-note">[ SIGNAL: BUILDING ]</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(el => {
+        if (el.isIntersecting) {
+          el.target.style.width = el.target.dataset.width;
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.bar-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.dataset.width = w;
+      bar.style.width = '0%';
+      observer.observe(bar);
     });
-  }, { threshold: 0.3 });
-
-  document.querySelectorAll('.bar-fill').forEach(bar => {
-    const w = bar.style.width;
-    bar.dataset.width = w;
-    bar.style.width = '0%';
-    observer.observe(bar);
-  });
-</script>
+  </script>
 </body>
+
 </html>
