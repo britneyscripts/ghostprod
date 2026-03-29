@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, Shield, Zap, Cpu, AlertTriangle, CheckCircle2, Ghost, ArrowRight, Mail, Globe, Layout, Code } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { db, collection, addDoc, serverTimestamp } from './firebase';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -110,19 +109,9 @@ export default function App() {
     }
   };
 
-  const handleSubscribe = async (e: React.FormEvent) => {
+  const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    try {
-      await addDoc(collection(db, 'beta_leads'), {
-        email,
-        timestamp: serverTimestamp(),
-        source: 'app_lead_capture',
-      });
-    } catch (err) {
-      // Firestore indisponível não bloqueia o usuário
-      console.error('Lead capture error:', err);
-    }
     setSubscribed(true);
     setEmail('');
   };
