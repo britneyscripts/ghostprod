@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, Shield, Zap, Cpu, AlertTriangle, CheckCircle2, Ghost, ArrowRight, Mail, Globe, Layout, Code } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { db, collection, addDoc, serverTimestamp } from './firebase';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -57,7 +58,8 @@ export default function App() {
     setResult(null);
 
     try {
-      const response = await fetch('http://localhost:8000/analyze', {
+      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiBase}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,9 +110,19 @@ export default function App() {
     }
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    try {
+      await addDoc(collection(db, 'beta_leads'), {
+        email,
+        timestamp: serverTimestamp(),
+        source: 'app_lead_capture',
+      });
+    } catch (err) {
+      // Firestore indisponível não bloqueia o usuário
+      console.error('Lead capture error:', err);
+    }
     setSubscribed(true);
     setEmail('');
   };
@@ -263,15 +275,15 @@ export default function App() {
                     <div className="font-mono text-[9px] mb-3 text-text-muted">PAGESPEED (LAB DATA)</div>
                     <div className="grid grid-cols-2 gap-3">
                       <CircularScore
-                        label="Rendimiento"
+                        label="Performance"
                         value={result.lighthouse?.performance || 0}
                       />
                       <CircularScore
-                        label="Accesibilidad"
+                        label="Accessibility"
                         value={result.lighthouse?.accessibility || 0}
                       />
                       <CircularScore
-                        label="Recomendaciones"
+                        label="Best Practices"
                         value={result.lighthouse?.best_practices || 0}
                       />
                       <CircularScore
