@@ -1,119 +1,119 @@
 # ghostprod
 
-**AI Visibility Diagnostic for E-Commerce Product Pages**
+**Diagnóstico de visibilidade para agentes de IA em páginas de produto**
 
 > *Visível para humanos. Invisível para agentes.*
 
-[![Status](https://img.shields.io/badge/status-research%20in%20progress-8A2BE2?style=flat-square)](https://britneyscripts.github.io/ghostprod)
-[![Research](https://img.shields.io/badge/TCC-ICMC%2FUSP-FF6B00?style=flat-square)](https://icmc.usp.br)
-[![Market](https://img.shields.io/badge/market-Brasil-009c3b?style=flat-square)](https://britneyscripts.github.io/ghostprod)
+[![Status](https://img.shields.io/badge/status-pesquisa%20em%20andamento-8A2BE2?style=flat-square)](https://britneyscripts.github.io/ghostprod)
+[![TCC](https://img.shields.io/badge/TCC-ICMC%2FUSP-FF6B00?style=flat-square)](https://icmc.usp.br)
+[![Mercado](https://img.shields.io/badge/mercado-Brasil-009c3b?style=flat-square)](https://britneyscripts.github.io/ghostprod)
 
 ---
 
-## The Problem
+## O problema
 
-Product discovery is migrating from search engines to AI agents. ChatGPT, Perplexity, Google AI Mode, and shopping agents are now the first touchpoint for millions of purchase decisions — and they can only recommend products they can actually read.
+A descoberta de produtos está migrando dos buscadores para agentes de IA. ChatGPT, Perplexity, Google AI Mode e agentes de compra são hoje o primeiro ponto de contato de milhões de decisões de compra — e eles só recomendam produtos que conseguem ler.
 
-Most Brazilian e-commerce PDPs are invisible to agents. Not because the products are bad. Because the technical and semantic infrastructure wasn't built for machines.
+A maioria das PDPs do e-commerce brasileiro é invisível para agentes. Não porque os produtos sejam ruins. Porque a infraestrutura técnica e semântica não foi construída para máquinas.
 
-**The evidence:**
-- AI Overviews appeared in 14% of shopping queries — grew **5.6× in 4 months** (BrightEdge, 2025)
-- AI-driven traffic to e-commerces grew **302% in 2025** (Alhena.ai)
-- **58%** of consumers already use GenAI as a substitute for product search
-- **No existing tool** in Brazil measures agent-readiness specifically
-
----
-
-## What ghostprod does
-
-ghostprod analyzes an e-commerce product page and generates an **Agent-Readiness Score (ARS)** — a single number from 0 to 100 indicating whether an AI agent can find, read, and include that product in a comparison or recommendation.
-
-**Score classification:**
-
-| Score | Status | What it means |
-|-------|--------|---------------|
-| 0–30 | 👻 Ghost | Invisible — critical gaps across all dimensions |
-| 31–60 | ⚠️ At Risk | Partially readable — agent includes with incomplete data |
-| 61–80 | ✅ Readable | Agent can parse and include in comparison |
-| 81–100 | 🟢 Optimized | Agent-ready |
-
-The score is built on three independently measured dimensions: **technical performance** (real field data from Chrome users), **structured markup completeness**, and **content parseability for machine extraction**.
+**As evidências:**
+- AI Overviews apareceram em 14% das queries de compra — crescimento de **5,6× em 4 meses** (BrightEdge, 2025)
+- Tráfego de IA para e-commerces cresceu **302% em 2025** (Alhena.ai)
+- **58%** dos consumidores já usam GenAI como substituto do buscador para descoberta de produtos
+- **Nenhuma ferramenta** no Brasil mede especificamente agent-readiness
 
 ---
 
-## Architecture
+## O que o ghostprod faz
+
+O ghostprod analisa uma página de produto de e-commerce e gera um **Agent-Readiness Score (ARS)** — um número de 0 a 100 que indica se um agente de IA consegue encontrar, ler e incluir aquele produto em uma comparação ou recomendação.
+
+**Classificação do score:**
+
+| Score | Status | O que significa |
+|-------|--------|-----------------|
+| 0–30 | 👻 Ghost | Invisível — gaps críticos em todas as dimensões |
+| 31–60 | ⚠️ Em risco | Parcialmente legível — agente inclui com dados incompletos |
+| 61–80 | ✅ Legível | Agente consegue ler e incluir na comparação |
+| 81–100 | 🟢 Otimizado | Pronto para agentes |
+
+O score é construído sobre três dimensões medidas de forma independente: **performance técnica** (dados reais de usuários Chrome via CrUX), **completude de marcação estruturada** (Schema.org) e **parseabilidade de conteúdo** para extração por máquinas.
+
+---
+
+## Arquitetura
 
 ```
-User URL input
+URL de entrada
       ↓
-┌─────────────────────────────────────────┐
-│           Agent Orchestrator            │
-│                                         │
-│  Performance    Schema.org    Content   │
-│  Field Data     Completeness  Parsing   │
-│  (CrUX API)     (Playwright)  (NLP)     │
-│                                         │
-│              Gap Analysis               │
-│           (Agent Simulator)             │
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│           Orquestrador de Agentes        │
+│                                          │
+│  Performance    Schema.org    Conteúdo   │
+│  Field Data     Completude    NLP        │
+│  (CrUX API)     (Playwright)  (spaCy)    │
+│                                          │
+│              Gap Analysis                │
+│          (Simulador de Agente)           │
+└──────────────────────────────────────────┘
       ↓
 Agent-Readiness Score (0–100)
-+ Dimension breakdown
-+ Prioritized recommendations
++ Breakdown por dimensão
++ Recomendações priorizadas por impacto
 ```
 
-**Frontend stack** (this repository):
+**Stack frontend** (este repositório):
 React 19 · Vite 6 · Tailwind CSS 4 · Firebase Hosting
 
-**Backend stack** (private repository — active research):
+**Stack backend** (repositório privado — pesquisa ativa):
 Python 3.11 · FastAPI · Playwright · spaCy · Google CrUX API · BigQuery
 
 ---
 
-## Research basis
+## Base de pesquisa
 
-ghostprod is developed as applied research for an **MBA in Data Science at ICMC/USP** (Universidade de São Paulo).
+O ghostprod é desenvolvido como pesquisa aplicada para um **MBA em Ciência de Dados no ICMC/USP** (Universidade de São Paulo).
 
-The research investigates whether a composite scoring model based on CrUX field data, structured markup analysis, and NLP-based content density can reliably predict AI agent visibility for Brazilian e-commerce product pages — and whether hypothesis-defined weights reflect actual agent behavior when validated empirically.
+A pesquisa investiga se um modelo de scoring composto — baseado em dados de campo do CrUX, análise de marcação estruturada e densidade de conteúdo via NLP — consegue prever de forma confiável a visibilidade de PDPs do e-commerce brasileiro para agentes de IA, e se os pesos definidos por hipótese refletem o comportamento real dos agentes quando validados empiricamente.
 
-**Research sample:** 10 Brazilian beauty and cosmetics companies across market segments — from mass market and direct sales (Grupo Boticário, Natura &Co) to prestige retail (Sephora Brasil/LVMH, Época Cosméticos/Magazine Luiza) and independent DNVBs (Sallve, Creamy, Principia Skin).
+**Amostra de pesquisa:** 10 empresas brasileiras de beleza e cosméticos em diferentes segmentos — de mass market e venda direta (Grupo Boticário, Natura &Co) a varejo de prestígio (Sephora Brasil/LVMH, Época Cosméticos/Magazine Luiza) e DNVBs independentes (Sallve, Creamy, Principia Skin).
 
-**Method:** Longitudinal daily data collection + controlled agent simulation experiments + supervised learning model to validate scoring weights.
+**Método:** Coleta longitudinal diária + experimentos controlados de simulação com agentes + modelo supervisionado para validar os pesos do scoring.
 
-*Thesis in progress — ICMC/USP, 2026.*
+*TCC em andamento — ICMC/USP, 2026.*
 
 ---
 
 ## Status
 
-| Phase | Status | Period |
-|-------|--------|--------|
-| Market analysis + research design | ✅ Complete | Feb 2026 |
-| Data pipeline (CrUX + Schema + NLP) | 🔄 In progress | Mar–Apr 2026 |
-| Longitudinal collection — 10 companies | 🔄 In progress | Apr–Jun 2026 |
-| MVP application | 🔄 In progress | Apr–May 2026 |
-| Agent simulation experiments | ⏳ Planned | May 2026 |
-| ML model — learned vs. hypothesis weights | ⏳ Planned | Jun 2026 |
-| TCC submission — ICMC/USP | ⏳ Planned | Jul 2026 |
+| Fase | Status | Período |
+|------|--------|---------|
+| Análise de mercado + design de pesquisa | ✅ Concluído | Fev 2026 |
+| Pipeline de dados (CrUX + Schema + NLP) | 🔄 Em andamento | Mar–Abr 2026 |
+| Coleta longitudinal — 10 empresas | 🔄 Em andamento | Abr–Jun 2026 |
+| Aplicação MVP | 🔄 Em andamento | Abr–Mai 2026 |
+| Experimentos de simulação com agentes | ⏳ Planejado | Mai 2026 |
+| Modelo ML — pesos aprendidos vs. hipótese | ⏳ Planejado | Jun 2026 |
+| Submissão TCC — ICMC/USP | ⏳ Planejado | Jul 2026 |
 
 ---
 
-## Who this is for
+## Para quem é
 
-**Senior PMs, Heads of Digital, VP E-Commerce** at mid-to-large Brazilian e-commerces who need to justify Schema.org and technical infrastructure investment to CTOs — with data, not intuition.
+**PMs Senior, Heads of Digital, VP E-Commerce** de e-commerces brasileiros de médio e grande porte que precisam justificar investimento em Schema.org e infraestrutura técnica para CTOs — com dado, não intuição.
 
-**SEO and performance agencies** adding agent-readiness as a new diagnostic offering for clients.
+**Agências de SEO e performance** que adicionam agent-readiness como novo serviço de diagnóstico para clientes.
 
 ---
 
-## About
+## Sobre
 
-**Eva De Paula** — Senior Lead PM with 15+ years in e-commerce and retail tech across Brazil and Uruguay. Returning to Brazil in 2026.
+**Eva De Paula** — Senior Lead PM com 15+ anos em e-commerce e tech de varejo no Brasil e Uruguai. Retornando ao Brasil em 2026.
 
-MBA in Data Science — ICMC/USP (thesis in progress).
-Publishes original research on agentic commerce at Substack.
+MBA em Ciência de Dados — ICMC/USP (TCC em andamento).
+Publica pesquisa original sobre agentic commerce no Substack.
 
-ghostprod is simultaneously a research instrument, a working product, and a market hypothesis — built end-to-end by one PM, from data pipeline to frontend to academic methodology.
+O ghostprod é simultaneamente um instrumento de pesquisa, um produto funcional e uma hipótese de mercado — construído de ponta a ponta por uma PM: do pipeline de dados ao frontend até a metodologia acadêmica.
 
 ---
 
@@ -126,29 +126,29 @@ ghostprod is simultaneously a research instrument, a working product, and a mark
 
 ---
 
-## Repository structure
+## Estrutura do repositório
 
 ```
-ghostprod/ (public)
-├── frontend/          ← React application
+ghostprod/ (público)
+├── frontend/          ← aplicação React
 │   └── src/
-│       ├── App.tsx    ← main UI
+│       ├── App.tsx    ← UI principal
 │       ├── firebase.ts
-│       └── index.css  ← vaporwave design system
-├── docs/              ← market analysis + methodology (in progress)
+│       └── index.css  ← design system vaporwave
+├── docs/              ← análise de mercado + metodologia
 ├── README.md
 ├── CONTRIBUTING.md
 └── LICENSE
 ```
 
-*Backend, scoring algorithm, research data and TCC analysis are maintained in a private repository as part of active academic research. Methodology will be published upon thesis submission.*
+*Backend, algoritmo de scoring, dados de pesquisa e análise do TCC são mantidos em repositório privado como parte da pesquisa acadêmica ativa. A metodologia será publicada após a submissão da tese.*
 
 ---
 
-## License
+## Licença
 
-MIT — see [LICENSE](LICENSE)
+MIT — ver [LICENSE](LICENSE)
 
 ---
 
-<sub>Built with Python · FastAPI · React · Playwright · spaCy · Google CrUX API · BigQuery · ICMC/USP</sub>
+<sub>Construído com Python · FastAPI · React · Playwright · spaCy · Google CrUX API · BigQuery · ICMC/USP</sub>
