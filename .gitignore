@@ -94,10 +94,19 @@ yarn-error.log*
 # NÃO ignorar Dockerfile (necessário para Cloud Run)
 
 # ============================================
+# IP PROTEGIDO — nunca vai para repo público
+# (estes arquivos vivem em ghostprod-core)
+# ============================================
+backend/
+firebase-blueprint.json
+data/
+notebooks/
+tcc/
+*.ipynb
+
+# ============================================
 # Dados de pesquisa (sensível)
 # ============================================
-data/raw/
-data/outputs/
 *.csv
 # exceto arquivos de exemplo
 !data/examples/*.csv
