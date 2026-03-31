@@ -1,7 +1,21 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
-import axios from "axios";
+// safeFetch: workaround para replicar o comportamento de erro do Axios com fetch nativo
+async function safeFetch(url: string, options: RequestInit = {}) {
+  const response = await fetch(url, {
+    ...options,
+    signal: AbortSignal.timeout(10000),
+  });
+
+  if (!response.ok) {
+    const error = new Error(`Erro HTTP! Status: ${response.status}`);
+    (error as any).status = response.status;
+    throw error;
+  }
+
+  return response;
+}
 
 async function startServer() {
   const app = express();
@@ -17,16 +31,22 @@ async function startServer() {
     if (!url) return res.status(400).json({ error: "URL is required" });
 
     try {
-      const response = await axios.get(url, {
+      const response = await safeFetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; ghostprod-bot/0.1; +https://ghostprod.io)",
         },
-        timeout: 10000,
       });
-      res.json({ html: response.data });
+
+      const html = await response.text();
+      res.json({ html });
     } catch (error: any) {
-      console.error("Fetch error:", error);
-      res.status(500).json({ error: "Failed to fetch URL. " + (error.message || "") });
+      console.error("Erro na coleta ghostprod:", error.message);
+
+      const status = error.status || 500;
+      res.status(status).json({
+        error: `Falha ao acessar PDP: ${error.message}`,
+        ars_status: "incompleto",
+      });
     }
   });
 
