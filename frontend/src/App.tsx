@@ -8,7 +8,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Types - Ajustados para bater com o seu Backend Python
+// Types - Adjusted to match your Python Backend
 interface AnalysisResult {
   url: string;
   score: number;
@@ -19,21 +19,21 @@ interface AnalysisResult {
     content: number;
   };
   pagespeedStatus?: string;
-  // NOVO: scores individuais do Lighthouse
+  // NEW: individual Lighthouse scores
   lighthouse?: {
     performance: number;
     accessibility: number;
     best_practices: number;
     seo: number;
   };
-  // NOVO: métricas de milissegundos crus do PageSpeed (CWV)
+  // NEW: raw PageSpeed millisecond metrics (CWV)
   core_vitals?: {
     lcp: string;
     cls: string;
     tbt: string;
     fcp: string;
   };
-  // NOVO: qualidade do Schema.org
+  // NEW: Schema.org quality
   schema_quality?: {
     structure: number;
     quality: number;
@@ -77,7 +77,7 @@ export default function App() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Falha na análise do backend');
+        throw new Error(data.detail || 'Backend analysis failed');
       }
 
       setResult({
@@ -90,21 +90,21 @@ export default function App() {
           schema: data.agentes?.schema?.score || 0,
           content: data.agentes?.conteudo?.score || 0,
         },
-        // NOVO: extrai scores individuais do Lighthouse
+        // NEW: extracts individual Lighthouse scores
         lighthouse: {
           performance: data.agentes?.pagespeed?.score || 0,
           accessibility: data.agentes?.pagespeed?.accessibility_score || 0,
           best_practices: data.agentes?.pagespeed?.best_practices_score || 0,
           seo: data.agentes?.pagespeed?.seo_score || 0,
         },
-        // NOVO: extrai milissegundos crus para linha de detalhe
+        // NEW: extracts raw milliseconds for detail line
         core_vitals: {
           lcp: data.agentes?.pagespeed?.metricas?.lcp?.display || "N/A",
           cls: data.agentes?.pagespeed?.metricas?.cls?.display || "N/A",
           tbt: data.agentes?.pagespeed?.metricas?.tbt?.display || "N/A",
           fcp: data.agentes?.pagespeed?.metricas?.fcp?.display || "N/A",
         },
-        // NOVO: extrai qualidade do Schema
+        // NEW: extracts Schema quality
         schema_quality: {
           structure: data.agentes?.schema_quality?.structure_score || data.agentes?.schema?.score || 0,
           quality: data.agentes?.schema_quality?.quality_score || data.agentes?.schema?.score || 0,
@@ -112,9 +112,9 @@ export default function App() {
           campos_faltando: data.agentes?.schema_quality?.campos_faltando || [],
         },
         analysis: {
-          gap: data.agentes?.gap_analysis?.analise || data.agentes?.gap_analysis?.motivo || "Análise indisponível",
+          gap: data.agentes?.gap_analysis?.analise || data.agentes?.gap_analysis?.motivo || "Analysis unavailable",
           missing: data.agentes?.gap_analysis?.campos_faltando || [],
-          recommendation: data.recomendacoes?.[0] || "Otimize os metadados técnicos.",
+          recommendation: data.recomendacoes?.[0] || "Optimize technical metadata.",
         },
         timestamp: new Date().toISOString(),
       });
@@ -234,8 +234,8 @@ export default function App() {
                 </div>
                 <div className="text-left text-sm text-text-muted">
                   <strong className="text-neon-yellow block mb-1">BETA ENVIRONMENT</strong>
-                  A extração profunda com IA e PageSpeed em URLs Reais é uma operação massiva.
-                  <span className="block mt-1 text-xs">Este processo pode demorar até <strong>120 segundos</strong> por causa das cotas do Google. Por favor, <strong>não atualize</strong> a página.</span>
+                  Deep extraction with AI and PageSpeed on Real URLs is a massive operation.
+                  <span className="block mt-1 text-xs">This process can take up to <strong>120 seconds</strong> due to Google quotas. Please <strong>do not refresh</strong> the page.</span>
                 </div>
               </motion.div>
 
@@ -325,22 +325,22 @@ export default function App() {
                   {/* NOVO: CORE WEB VITALS (NUMERINHOS) */}
                   {result.core_vitals && (
                     <div className="w-full mt-4 p-3 bg-void/50 border border-white/10 rounded-lg">
-                      <div className="font-mono text-[9px] mb-3 text-text-muted">CORE WEB VITALS (DETALHADO)</div>
+                      <div className="font-mono text-[9px] mb-3 text-text-muted">CORE WEB VITALS (DETAILED)</div>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         <div className="flex flex-col">
-                          <span className="font-mono text-[8px] text-text-muted uppercase">LCP (Pintura Maior)</span>
+                          <span className="font-mono text-[8px] text-text-muted uppercase">LCP (Largest Contentful Paint)</span>
                           <span className="font-mono text-xs text-neon-cyan">{result.core_vitals.lcp}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-mono text-[8px] text-text-muted uppercase">CLS (Mudança Layout)</span>
+                          <span className="font-mono text-[8px] text-text-muted uppercase">CLS (Cumulative Layout Shift)</span>
                           <span className="font-mono text-xs text-neon-pink">{result.core_vitals.cls}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-mono text-[8px] text-text-muted uppercase">TBT (Tempo Bloqueio)</span>
+                          <span className="font-mono text-[8px] text-text-muted uppercase">TBT (Total Blocking Time)</span>
                           <span className="font-mono text-xs text-neon-purple">{result.core_vitals.tbt}</span>
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-mono text-[8px] text-text-muted uppercase">FCP (Primeira Pintura)</span>
+                          <span className="font-mono text-[8px] text-text-muted uppercase">FCP (First Contentful Paint)</span>
                           <span className="font-mono text-xs text-white">{result.core_vitals.fcp}</span>
                         </div>
                       </div>
@@ -357,12 +357,12 @@ export default function App() {
                     {/* Sub-scores do Schema */}
                     <div className="bg-void/30 rounded-lg p-3 space-y-2 border border-white/5">
                       <div className="flex justify-between items-center">
-                        <span className="font-mono text-[8px] text-text-muted uppercase">✓ Estrutura válida</span>
+                        <span className="font-mono text-[8px] text-text-muted uppercase">✓ Valid structure</span>
                         <span className="font-mono text-[8px] text-neon-cyan">{result.schema_quality?.structure || result.breakdown.schema}%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span className="font-mono text-[8px] text-text-muted uppercase">
-                          {result.schema_quality?.quality >= 70 ? '✓' : '⚠️'} Qualidade de dados
+                          {result.schema_quality?.quality >= 70 ? '✓' : '⚠️'} Data quality
                         </span>
                         <span className={`font-mono text-[8px] ${(result.schema_quality?.quality || 0) >= 70 ? 'text-neon-cyan' : 'text-neon-pink'
                           }`}>
@@ -373,7 +373,7 @@ export default function App() {
                       {/* Problemas encontrados */}
                       {result.schema_quality?.problemas && result.schema_quality.problemas.length > 0 && (
                         <div className="mt-2 pt-2 border-t border-white/5">
-                          <div className="font-mono text-[7px] text-neon-pink mb-1 uppercase">Problemas:</div>
+                          <div className="font-mono text-[7px] text-neon-pink mb-1 uppercase">Problems:</div>
                           {result.schema_quality.problemas.slice(0, 2).map((problema, i) => (
                             <div key={i} className="font-mono text-[7px] text-text-muted mb-1">
                               • {problema}
@@ -398,7 +398,7 @@ export default function App() {
                         Agent Simulation (Gap Analysis)
                       </h3>
                       <p className="font-mono text-[10px] text-text-muted mt-1 uppercase tracking-wider">
-                        Simulação: Agente de compras real tentando responder query do usuário
+                        Simulation: Real shopping agent trying to answer user query
                       </p>
                     </div>
                   </div>
@@ -410,7 +410,7 @@ export default function App() {
                   <div className="bg-void/80 p-4 rounded-lg border border-white/5">
                     <h4 className="font-mono text-xs text-neon-pink mb-3 uppercase tracking-wider flex items-center gap-2">
                       Missing in Schema.org:
-                      <span className="text-[10px] text-text-muted normal-case">(campos que deveriam estar estruturados)</span>
+                      <span className="text-[10px] text-text-muted normal-case">(fields that should be structured)</span>
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {result.analysis.missing.length > 0 ? (
@@ -420,7 +420,7 @@ export default function App() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-[10px] text-neon-cyan font-mono">✓ Nenhum campo crítico faltando</span>
+                        <span className="text-[10px] text-neon-cyan font-mono">✓ No critical fields missing</span>
                       )}
                     </div>
                   </div>
@@ -428,7 +428,7 @@ export default function App() {
 
                 <div className="glass-card p-6 bg-void/50 border border-white/10">
                   <h3 className="font-display text-lg text-neon-purple mb-4 flex items-center gap-2 uppercase">
-                    <Code size={20} /> Recomendação Específica
+                    <Code size={20} /> Specific Recommendation
                   </h3>
                   <p className="font-sans text-text-primary leading-relaxed mb-4">
                     {result.analysis.recommendation}
@@ -439,10 +439,10 @@ export default function App() {
                     <div className="bg-void/80 p-4 rounded-lg border border-neon-purple/20 font-mono text-xs">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-neon-purple text-[10px] uppercase tracking-wider">
-                          Adicione ao Schema.org JSON-LD:
+                          Add to Schema.org JSON-LD:
                         </span>
                         <span className="text-neon-cyan text-[10px]">
-                          Impacto estimado: +{result.analysis.missing.length * 15}% NLP
+                          Estimated impact: +{result.analysis.missing.length * 15}% NLP
                         </span>
                       </div>
                       <pre className="text-[10px] text-text-muted overflow-x-auto">
@@ -451,7 +451,7 @@ ${result.analysis.missing.map((field, i) =>
                           `  {
     "@type": "PropertyValue",
     "name": "${field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}",
-    "value": "Especifique aqui"
+    "value": "Specify here"
   }${i < result.analysis.missing.length - 1 ? ',' : ''}`
                         ).join('\n')}
 ]`}
