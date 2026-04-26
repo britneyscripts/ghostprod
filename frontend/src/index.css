@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&family=Outfit:wght@400;600&display=swap');
+@import "tailwindcss";
 
 @theme {
   --font-display: "Orbitron", sans-serif;

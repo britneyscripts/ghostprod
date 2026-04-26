@@ -18,12 +18,20 @@ interface AnalysisResult {
     schema: number;
     content: number;
   };
+  pagespeedStatus?: string;
   // NOVO: scores individuais do Lighthouse
   lighthouse?: {
     performance: number;
     accessibility: number;
     best_practices: number;
     seo: number;
+  };
+  // NOVO: métricas de milissegundos crus do PageSpeed (CWV)
+  core_vitals?: {
+    lcp: string;
+    cls: string;
+    tbt: string;
+    fcp: string;
   };
   // NOVO: qualidade do Schema.org
   schema_quality?: {
@@ -75,6 +83,7 @@ export default function App() {
       setResult({
         url: data.url,
         score: data.ars || 0,
+        pagespeedStatus: data.agentes?.pagespeed?.status || 'ok',
         breakdown: {
           crux: data.agentes?.crux?.score || 0,
           pagespeed: data.agentes?.pagespeed?.score || 0,
@@ -87,6 +96,13 @@ export default function App() {
           accessibility: data.agentes?.pagespeed?.accessibility_score || 0,
           best_practices: data.agentes?.pagespeed?.best_practices_score || 0,
           seo: data.agentes?.pagespeed?.seo_score || 0,
+        },
+        // NOVO: extrai milissegundos crus para linha de detalhe
+        core_vitals: {
+          lcp: data.agentes?.pagespeed?.metricas?.lcp?.display || "N/A",
+          cls: data.agentes?.pagespeed?.metricas?.cls?.display || "N/A",
+          tbt: data.agentes?.pagespeed?.metricas?.tbt?.display || "N/A",
+          fcp: data.agentes?.pagespeed?.metricas?.fcp?.display || "N/A",
         },
         // NOVO: extrai qualidade do Schema
         schema_quality: {
@@ -205,6 +221,24 @@ export default function App() {
                 <p>AGENT 3: ANALYZING NLP ATTRIBUTE DENSITY...</p>
                 <p>AGENT 4: RUNNING GAP ANALYSIS SIMULATION...</p>
               </div>
+              
+              {/* BETA WARNING BANNER */}
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5 }}
+                className="mt-8 max-w-md w-full bg-surface-light border border-neon-yellow/30 p-4 rounded-lg flex items-start gap-4"
+              >
+                <div className="text-neon-yellow mt-0.5">
+                  <AlertTriangle size={20} />
+                </div>
+                <div className="text-left text-sm text-text-muted">
+                  <strong className="text-neon-yellow block mb-1">BETA ENVIRONMENT</strong>
+                  A extração profunda com IA e PageSpeed em URLs Reais é uma operação massiva.
+                  <span className="block mt-1 text-xs">Este processo pode demorar até <strong>120 segundos</strong> por causa das cotas do Google. Por favor, <strong>não atualize</strong> a página.</span>
+                </div>
+              </motion.div>
+
             </motion.div>
           )}
         </AnimatePresence>
@@ -262,25 +296,56 @@ export default function App() {
                   {/* PAGESPEED EXPANDIDO - 4 cards individuais com bolinhas */}
                   <div className="w-full">
                     <div className="font-mono text-[9px] mb-3 text-text-muted">PAGESPEED (LAB DATA)</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <CircularScore
-                        label="Performance"
-                        value={result.lighthouse?.performance || 0}
-                      />
-                      <CircularScore
-                        label="Accessibility"
-                        value={result.lighthouse?.accessibility || 0}
-                      />
-                      <CircularScore
-                        label="Best Practices"
-                        value={result.lighthouse?.best_practices || 0}
-                      />
-                      <CircularScore
-                        label="SEO"
-                        value={result.lighthouse?.seo || 0}
-                      />
-                    </div>
+                    {result.pagespeedStatus === "erro" ? (
+                      <div className="w-full flex items-center gap-2 px-3 py-2 bg-neon-pink/10 border border-neon-pink/20 rounded text-neon-pink font-mono text-xs uppercase shadow-[0_0_10px_rgba(255,107,173,0.2)]">
+                        <AlertTriangle size={14} /> WAF Blocked (Time Out)
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3">
+                        <CircularScore
+                          label="Performance"
+                          value={result.lighthouse?.performance || 0}
+                        />
+                        <CircularScore
+                          label="Accessibility"
+                          value={result.lighthouse?.accessibility || 0}
+                        />
+                        <CircularScore
+                          label="Best Practices"
+                          value={result.lighthouse?.best_practices || 0}
+                        />
+                        <CircularScore
+                          label="SEO"
+                          value={result.lighthouse?.seo || 0}
+                        />
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* NOVO: CORE WEB VITALS (NUMERINHOS) */}
+                  {result.core_vitals && (
+                    <div className="w-full mt-4 p-3 bg-void/50 border border-white/10 rounded-lg">
+                      <div className="font-mono text-[9px] mb-3 text-text-muted">CORE WEB VITALS (DETALHADO)</div>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[8px] text-text-muted uppercase">LCP (Pintura Maior)</span>
+                          <span className="font-mono text-xs text-neon-cyan">{result.core_vitals.lcp}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[8px] text-text-muted uppercase">CLS (Mudança Layout)</span>
+                          <span className="font-mono text-xs text-neon-pink">{result.core_vitals.cls}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[8px] text-text-muted uppercase">TBT (Tempo Bloqueio)</span>
+                          <span className="font-mono text-xs text-neon-purple">{result.core_vitals.tbt}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-mono text-[8px] text-text-muted uppercase">FCP (Primeira Pintura)</span>
+                          <span className="font-mono text-xs text-white">{result.core_vitals.fcp}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* SCHEMA.ORG EXPANDIDO - Structure + Quality */}
                   <div className="w-full">
