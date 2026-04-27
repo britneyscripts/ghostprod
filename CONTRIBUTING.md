@@ -1,39 +1,39 @@
-# Contribuindo com o ghostprod
+# Contributing to ghostprod
 
-O ghostprod é um projeto solo vinculado a uma pesquisa acadêmica em andamento (TCC ICMC/USP). Contribuições externas ao frontend são bem-vindas.
-
----
-
-## O que está aberto para contribuição
-
-- `frontend/` — aplicação React (UI, design system, acessibilidade)
-- `docs/` — correções e melhorias na documentação pública
-
-O backend, algoritmo de scoring e dados de pesquisa são mantidos em repositório privado e **não estão abertos para contribuição externa** neste momento.
+ghostprod is a solo project linked to ongoing academic research (MBA Thesis ICMC/USP). External contributions to the frontend are welcome.
 
 ---
 
-## Fluxo para contribuir
+## What is open for contribution
+
+- `frontend/` — React application (UI, design system, accessibility)
+- `docs/` — corrections and improvements to public documentation
+
+The backend, scoring algorithm, and research data are maintained in a private repository and **are not open for external contribution** at this time.
+
+---
+
+## Contribution Flow
 
 ```bash
-# 1. Fork do repositório
-# 2. Crie uma branch descritiva
-git checkout -b fix/nome-do-problema
+# 1. Fork the repository
+# 2. Create a descriptive branch
+git checkout -b fix/issue-name
 
-# 3. Commit com mensagem clara
-git commit -m "fix: descrição do que foi corrigido"
+# 3. Commit with a clear message
+git commit -m "fix: description of what was fixed"
 
-# 4. Abra um Pull Request para a branch main
+# 4. Open a Pull Request to the main branch
 ```
 
 ---
 
-## Regras básicas
+## Basic Rules
 
-- Sem chaves de API ou dados sensíveis nos commits
-- Mudanças no frontend devem rodar localmente sem erros antes do PR
-- PRs com escopo amplo ou sem contexto não serão aceitos
+- No API keys or sensitive data in commits
+- Frontend changes must run locally without errors before the PR
+- Wide-scope PRs or those without context will not be accepted
 
 ---
 
-Dúvidas: [ghostprod.io](https://britneyscripts.github.io/ghostprod)
+Questions: [ghostprod.io](https://britneyscripts.github.io/ghostprod)
